@@ -1,0 +1,62 @@
+{
+  "name": "google-reverse-proxy",
+  "version": "1.0.0",
+  "description": "OpenAI-compatible reverse proxy for Google AI products. Today: Gemini CLI + Google AI Studio. Planned: Antigravity and friends.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22 <25"
+  },
+  "author": "David Courtis (https://ko-fi.com/mousedev)",
+  "homepage": "https://github.com/david-courtis/google-reverse-proxy#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/david-courtis/google-reverse-proxy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/david-courtis/google-reverse-proxy/issues"
+  },
+  "keywords": [
+    "google",
+    "gemini",
+    "ai-studio",
+    "openai",
+    "proxy",
+    "reverse-proxy",
+    "llm",
+    "claude-code",
+    "opencode"
+  ],
+  "scripts": {
+    "start": "tsx src/main.ts",
+    "dev": "tsx watch src/main.ts",
+    "format": "prettier --write src",
+    "format:check": "prettier --check src",
+    "lint": "eslint --ext .ts src && npm run tsc",
+    "lint:fix": "eslint --ext .ts src --fix",
+    "tsc": "tsc --noEmit --skipLibCheck",
+    "test": "vitest run",
+    "test:capture": "node test/e2e/capture-golden.mjs"
+  },
+  "dependencies": {
+    "@google/gemini-cli-core": "0.42.0",
+    "@google/genai": "1.30.0",
+    "@hono/node-server": "^1.13.7",
+    "google-auth-library": "^9.11.0",
+    "hono": "^4.9.2",
+    "yaml": "^2.9.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.32.0",
+    "@types/node": "^24.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.39.1",
+    "@typescript-eslint/parser": "^8.39.1",
+    "eslint": "^9.33.0",
+    "mockttp": "^3.15.0",
+    "prettier": "^3.6.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.4.5",
+    "vitest": "^2.1.9"
+  }
+}

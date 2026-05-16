@@ -1,0 +1,41 @@
+{
+  "headers": {
+    "content-type": "application/json",
+    "user-agent": "CloudCodeVSCode/0.42.0 (aidev_client; os_type=Windows; os_version=10.0.26200; arch=x64; host_path=VSCode/unknown; proxy_client=geminicli) google-api-nodejs-client/9.15.1",
+    "authorization": "Bearer <REDACTED>",
+    "x-goog-api-client": "<GL_NODE>"
+  },
+  "body": {
+    "model": "gemini-2.5-pro",
+    "project": "<PROJECT>",
+    "user_prompt_id": "<UUID>",
+    "request": {
+      "contents": [
+        {
+          "role": "user",
+          "parts": [
+            {
+              "text": "ping"
+            }
+          ]
+        }
+      ],
+      "systemInstruction": {
+        "role": "user",
+        "parts": [
+          {
+            "text": "You are a parity probe."
+          }
+        ]
+      },
+      "generationConfig": {
+        "temperature": 0.7,
+        "thinkingConfig": {
+          "thinkingBudget": -1,
+          "includeThoughts": false
+        }
+      },
+      "session_id": "<UUID>"
+    }
+  }
+}
