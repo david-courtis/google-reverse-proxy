@@ -1,0 +1,132 @@
+<div x-data="geminiSettings" class="view-container-centered">
+    <div class="view-card !p-0 flex flex-col overflow-hidden">
+        <div class="bg-space-900/50 border-b border-space-border px-8 pt-8 pb-6 shrink-0">
+            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                <svg class="w-5 h-5 text-neon-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Settings
+            </h3>
+            <p class="text-xs text-gray-500 mt-1 font-mono">Account-pool, thinking, models and dashboard access. Stored in KV; applied immediately (no restart).</p>
+        </div>
+
+        <div class="p-8 space-y-8">
+            <!-- Pool -->
+            <section class="space-y-4">
+                <h4 class="text-sm font-bold text-neon-cyan uppercase tracking-wider">Account Pool</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label class="form-control">
+                        <span class="text-xs text-gray-400 mb-1 block">Selection strategy</span>
+                        <select x-model="cfg.selectionStrategy" class="input">
+                            <option value="random">random, even spread across healthy accounts</option>
+                            <option value="round-robin">round-robin, rotate in order</option>
+                            <option value="failover">failover, stick to one until it rate-limits</option>
+                        </select>
+                        <span class="text-[11px] text-gray-600 mt-1 block">How a Google account is picked for each request.</span>
+                    </label>
+                    <label class="form-control">
+                        <span class="text-xs text-gray-400 mb-1 block">Cooldown after 429/503 (seconds)</span>
+                        <input type="number" min="60" x-model.number="cfg.cooldownSeconds"
+                               :placeholder="defaults.cooldownSeconds" class="input">
+                        <span class="text-[11px] text-gray-600 mt-1 block">How long a rate-limited account is skipped before it's retried. Default <span x-text="defaults.cooldownSeconds"></span>s.</span>
+                    </label>
+                    <label class="form-control">
+                        <span class="text-xs text-gray-400 mb-1 block">Per-account request budget (local fallback "quota")</span>
+                        <input type="number" min="1" x-model.number="cfg.requestQuota"
+                               :placeholder="defaults.requestQuota" class="input">
+                        <span class="text-[11px] text-gray-600 mt-1 block">Only used for the dashboard bar when Google's real quota can't be read. Default <span x-text="defaults.requestQuota"></span>.</span>
+                    </label>
+                    <label class="form-control">
+                        <span class="text-xs text-gray-400 mb-1 block">AI Studio API-key daily request quota</span>
+                        <input type="number" min="1" x-model.number="cfg.apiKeyDailyQuota"
+                               :placeholder="defaults.apiKeyDailyQuota" class="input">
+                        <span class="text-[11px] text-gray-600 mt-1 block">Daily request budget per Google AI Studio "free" API key. A key that reaches it is skipped until midnight America/Los_Angeles. Default <span x-text="defaults.apiKeyDailyQuota"></span>.</span>
+                    </label>
+                    <label class="form-control">
+                        <span class="text-xs text-gray-400 mb-1 block">Preferred upstream for bare model names</span>
+                        <select x-model="cfg.preferredAccountKind" class="input">
+                            <option value="cli">CLI (Code Assist OAuth) first, then API key</option>
+                            <option value="api">API key (AI Studio) first, then CLI</option>
+                        </select>
+                        <span class="text-[11px] text-gray-600 mt-1 block">Applies to requests without an explicit <code>:cli</code> or <code>:api</code> suffix. The non-preferred kind is used as a fallback when the preferred one is exhausted.</span>
+                    </label>
+                </div>
+            </section>
+
+            <!-- Thinking -->
+            <section class="space-y-4">
+                <h4 class="text-sm font-bold text-neon-cyan uppercase tracking-wider">Thinking &amp; Reasoning</h4>
+
+                <label class="flex items-start gap-3 text-sm text-gray-300">
+                    <input type="checkbox" x-model="cfg.enableRealThinking" class="checkbox mt-0.5">
+                    <span>
+                        <span class="block">Enable real Gemini thinking</span>
+                        <span class="text-[11px] text-gray-600">Asks Gemini for its actual step-by-step reasoning (the model "thinks" before answering). Off = answer only, slightly faster. On = the model reasons first; pair with the option below to see it.</span>
+                    </span>
+                </label>
+
+                <label class="flex items-start gap-3 text-sm text-gray-300">
+                    <input type="checkbox" x-model="cfg.streamThinkingAsContent" class="checkbox mt-0.5">
+                    <span>
+                        <span class="block">Stream thinking inline as &lt;thinking&gt; content</span>
+                        <span class="text-[11px] text-gray-600">When real thinking is on, the reasoning is streamed to the client wrapped in <code>&lt;thinking&gt;…&lt;/thinking&gt;</code> tags before the answer (DeepSeek-R1 style), instead of being hidden. Useful for clients that render a reasoning panel.</span>
+                    </span>
+                </label>
+
+                <label class="flex items-start gap-3 text-sm text-gray-300">
+                    <input type="checkbox" x-model="cfg.enableAutoModelSwitching" class="checkbox mt-0.5">
+                    <span>
+                        <span class="block">Auto model-switch on rate limit</span>
+                        <span class="text-[11px] text-gray-600">
+                            Last-resort fallback. On a 429/503 the proxy first rotates to <em>another account</em> keeping the requested model.
+                            Only if <strong>every</strong> account is rate-limited does it downgrade the model on the last account, in this order:
+                            <code>3.1-pro → 3-flash → 2.5-pro → 2.5-flash</code>. Off = return the 429 instead of downgrading.
+                        </span>
+                    </span>
+                </label>
+            </section>
+
+            <!-- Models -->
+            <section class="space-y-3">
+                <h4 class="text-sm font-bold text-neon-cyan uppercase tracking-wider">Model Visibility</h4>
+                <p class="text-xs text-gray-500">Unchecked models are hidden from <code>/v1/models</code> and the dashboard (they still work if requested directly).</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <template x-for="m in ($store.data.models || [])" :key="m">
+                        <label class="flex items-center gap-3 text-sm text-gray-300 font-mono">
+                            <input type="checkbox" :checked="cfg.modelVisibility[m] !== false"
+                                @change="cfg.modelVisibility[m] = $event.target.checked" class="checkbox">
+                            <span x-text="m"></span>
+                        </label>
+                    </template>
+                    <p x-show="!($store.data.models || []).length" class="text-xs text-gray-600">No models loaded yet, open the Models tab once.</p>
+                </div>
+            </section>
+
+            <div class="flex items-center gap-3 pt-2">
+                <button type="button" title="Save settings" class="btn btn-primary" :disabled="saving || !loaded" @click="save()">
+                    <span x-text="saving ? 'Saving…' : 'Save settings'">Save settings</span>
+                </button>
+                <span x-show="savedAt" class="text-xs text-neon-green" x-text="savedAt"></span>
+            </div>
+
+            <!-- Dashboard password -->
+            <section class="space-y-3 border-t border-space-border pt-6">
+                <h4 class="text-sm font-bold text-neon-cyan uppercase tracking-wider">Dashboard Password</h4>
+                <p class="text-xs text-gray-500">
+                    Optional. When set, the dashboard and every <code>/api</code> / <code>/account-limits</code> call require it
+                    (sent as an <code>x-webui-password</code> header; stored in your browser so it persists across reloads).
+                    Type a new value and Update to set it; leave blank and Update to remove it.
+                    <span x-show="cfg.hasPassword" class="text-neon-amber">A password is currently set.</span>
+                </p>
+                <div class="flex items-center gap-3">
+                    <input type="password" x-model="newPassword" placeholder="New password (blank = remove)" class="input max-w-xs">
+                    <button type="button" title="Update dashboard password" class="btn btn-ghost" :disabled="savingPw" @click="savePassword()">
+                        <span x-text="savingPw ? 'Saving…' : 'Update password'">Update password</span>
+                    </button>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>

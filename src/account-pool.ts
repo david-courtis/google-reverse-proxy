@@ -2,36 +2,8 @@ import { Env, OAuth2Credentials, AccountCredential, AccountKind, AccountSelectio
 import { logInfo } from "./log";
 import { KV_ACCOUNT_COOLDOWN_PREFIX, KV_ACCOUNT_POOL_KEY, KV_APIKEY_POOL_KEY } from "./config";
 import { getKV } from "./runtime/kv";
-import { effectiveConfig } from "./runtime/config";
-function b64urlDecode(s: string): string {
-	return Buffer.from(s.replace(/-/g, "+").replace(/_/g, "/"), "base64").toString("utf8");
-}
-
-function emailFromIdToken(idToken: string | undefined | null): string | null {
-	if (!idToken) return null;
-	const parts = idToken.split(".");
-	if (parts.length < 2) return null;
-	try {
-		const payload = JSON.parse(b64urlDecode(parts[1])) as { email?: string };
-		return typeof payload.email === "string" ? payload.email : null;
-	} catch {
-		return null;
-	}
-}
-
-function accountIdentityFromIdToken(idToken: string | undefined | null): string | null {
-	if (!idToken) return null;
-	const parts = idToken.split(".");
-	if (parts.length < 2) return null;
-	try {
-		const payload = JSON.parse(b64urlDecode(parts[1])) as { sub?: string; email?: string };
-		if (typeof payload.sub === "string" && payload.sub) return "sub:" + payload.sub;
-		if (typeof payload.email === "string" && payload.email) return "email:" + payload.email.toLowerCase();
-		return null;
-	} catch {
-		return null;
-	}
-}
+import { getAccountMeta, effectiveConfig } from "./webui-store";
+import { emailFromIdToken, accountIdentityFromIdToken } from "./oauth";
 
 function stableKey(creds: OAuth2Credentials): string {
 	return accountIdentityFromIdToken(creds.id_token) || "rt:" + (creds.refresh_token || "");
@@ -259,11 +231,11 @@ export async function loadCredentialPool(env: Env): Promise<AccountCredential[]>
 
 	if (merged.length === 0 && mergedApiKeys.length === 0) {
 		throw new Error(
-			"No accounts configured. Edit config.yaml or set GCP_SERVICE_ACCOUNT / GEMINI_API_KEYS."
+			"No accounts configured. Open /v1/auth/login to add an OAuth account, set GCP_SERVICE_ACCOUNT, or add a Google AI Studio API key (web UI / GEMINI_API_KEYS)."
 		);
 	}
 
-	const meta: Record<string, { email?: string; disabled?: boolean; source?: AccountCredential["source"] }> = {};
+	const meta = await getAccountMeta(env);
 	const kvCount = kvCreds.length;
 
 	const pool: AccountCredential[] = [];

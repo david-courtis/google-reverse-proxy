@@ -16,8 +16,7 @@ import { DEFAULT_THINKING_BUDGET, MIME_TYPE_MAP } from "../constants";
 import { AuthManager, InvalidGrantError } from "../auth";
 import { GeminiApiClient } from "../gemini-client";
 import { AccountPool } from "../account-pool";
-import { effectiveConfig } from "../runtime/config";
-import { recordUsage, usageForAccounts } from "../runtime/metrics";
+import { recordUsage, effectiveConfig, usageForAccounts } from "../webui-store";
 import { AutoModelSwitchingHelper } from "../helpers/auto-model-switching";
 import { createOpenAIStreamTransformer } from "../stream-transformer";
 import { isMediaTypeSupported, validateContent, validateModel } from "../utils/validation";
@@ -35,7 +34,7 @@ function trackUsage(c: Context<{ Bindings: Env }>, accountId: string, model: str
 export const OpenAIRoute = new Hono<{ Bindings: Env }>();
 
 OpenAIRoute.get("/models", async (c) => {
-	const cfg = effectiveConfig(c.env);
+	const cfg = await effectiveConfig(c.env);
 	const visibleBase = getAllModelIds().filter((modelId) => cfg.modelVisibility[modelId] !== false);
 	const expanded = [
 		...visibleBase,
@@ -196,7 +195,7 @@ OpenAIRoute.post("/chat/completions", async (c) => {
 		}
 
 		const rlHelper = new AutoModelSwitchingHelper(c.env);
-		const cfg = effectiveConfig(c.env);
+		const cfg = await effectiveConfig(c.env);
 		const rawOrder = await pool.selectionOrderForRoute(route, cfg.preferredAccountKind);
 
 		const apiKeyIds = rawOrder.filter((a) => a.kind === "apikey").map((a) => a.id);
@@ -493,7 +492,7 @@ OpenAIRoute.post("/audio/transcriptions", async (c) => {
 		let transcribeAccount;
 		try {
 			const pool = await AccountPool.create(c.env);
-			const cfg = effectiveConfig(c.env);
+			const cfg = await effectiveConfig(c.env);
 			transcribeAccount = (await pool.selectionOrderForRoute(route, cfg.preferredAccountKind))[0];
 		} catch {
 			transcribeAccount = undefined;
