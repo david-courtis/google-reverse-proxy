@@ -1,0 +1,74 @@
+name: Bug report
+description: Something doesn't work the way it should.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: A short description of the bug and what you expected instead.
+      placeholder: |
+        Hitting /v1/chat/completions with model X returns Y, expected Z.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: Minimal steps or a curl command. Redact tokens.
+      render: bash
+    validations:
+      required: true
+
+  - type: dropdown
+    id: bridge
+    attributes:
+      label: Which bridge
+      options:
+        - Bare model name (preferred upstream then fallback)
+        - ":cli" (Code Assist OAuth)
+        - ":api" (AI Studio API key)
+        - Not sure
+    validations:
+      required: true
+
+  - type: input
+    id: model
+    attributes:
+      label: Model id
+      placeholder: gemini-3.1-flash-lite-preview
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Proxy version
+      description: Run `curl http://localhost:8787/info` or check package.json.
+      placeholder: 1.0.0
+    validations:
+      required: true
+
+  - type: input
+    id: node
+    attributes:
+      label: Node version
+      placeholder: v24.5.0
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: OS
+      placeholder: Windows 11, macOS 14.6, Ubuntu 24.04
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Set DEBUG_LOGS=true if useful. Redact bearer tokens and refresh tokens.
+      render: text

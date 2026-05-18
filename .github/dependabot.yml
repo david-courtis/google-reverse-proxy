@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    # @google/gemini-cli-core is parity-critical — bumps need a re-captured
+    # golden baseline. Keep Dependabot from auto-PR'ing it.
+    ignore:
+      - dependency-name: "@google/gemini-cli-core"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"

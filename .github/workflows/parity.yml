@@ -1,0 +1,25 @@
+name: parity
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  golden-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Lint + typecheck
+        run: npm run lint
+
+      - name: Parity golden-diff (offline, zero-egress)
+        run: npm test

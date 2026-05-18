@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security disclosure
+    url: https://github.com/david-courtis/google-reverse-proxy/security/advisories/new
+    about: Report a credential leak, auth bypass, or other security-sensitive bug privately.
+  - name: Support the project
+    url: https://ko-fi.com/mousedev
+    about: Tip jar if the proxy saved you time.
