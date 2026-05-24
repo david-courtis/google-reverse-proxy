@@ -2,8 +2,6 @@
 
 <img src="public/logo.svg" alt="Google Reverse Proxy"/>
 
-# Google Reverse Proxy
-
 An OpenAI-compatible reverse proxy for Google's AI products.
 Pool many Google accounts behind one local OpenAI endpoint.
 UI Repurposed from badrisnarayanan's [AntiGravity Proxy](https://github.com/badrisnarayanan/antigravity-claude-proxy).
