@@ -154,7 +154,7 @@ Set as env vars or persist via `~/.gemini-cli-openai/config.json`. On Windows: `
 | `PORT`                   | `8787`                                                           | HTTP listen port.                                                                                      |
 | `HOST`                   | `0.0.0.0`                                                        | HTTP bind address.                                                                                     |
 | `GEMINI_CLI_OPENAI_HOME` | `~/.gemini-cli-openai`                                           | State directory for tokens, settings, metrics, dashboard password.                                     |
-| `CORS_ALLOWED_ORIGINS`   | `http://localhost:8787,http://127.0.0.1:8787,http://[::1]:8787`  | Comma-separated origins or `*`. Wildcard is risky when no dashboard password is set.                   |
+| `CORS_ALLOWED_ORIGINS`   | `localhost, 127.0.0.1,[::1] + :8787`  | Comma-separated origins or `*`. Wildcard is risky when no dashboard password is set.                   |
 
 ### Account pool
 
