@@ -21,8 +21,6 @@ UI Repurposed from badrisnarayanan's [AntiGravity Proxy](https://github.com/badr
 | Google AI Studio API keys                | Today, `:api` suffix | direct REST                              |
 | Antigravity (Cloud Code)                 | Planned              |                                          |
 
-*Antigravity note: Google has implemented extensive measures to detect third party usage, up to deep behavioral telemetry and internal state and storage tracking, fingerprinting, timestamping, and hashing. If you download the AG client and inspect the outbound requests yourself, you will see what I am talking about. It's insane. In order to be 100% stealth here, you would likely need to decompile Antigravity itself. Planned...*
-
 ## How it works
 
 ```mermaid
